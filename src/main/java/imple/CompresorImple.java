@@ -1,14 +1,13 @@
 package imple;
 
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.io.IOException;
-import java.io.DataOutputStream;
-
 
 import huffman.def.Compresor;
 import huffman.def.HuffmanInfo;
@@ -44,20 +43,32 @@ public class CompresorImple implements Compresor{
 	
 	// Retorna una lista ordenada donde cada nodo representa a cada byte del archivo
 	@Override
-	public List<HuffmanInfo> crearListaEnlazada(HuffmanTable arr[]){
-		List <HuffmanInfo> listahuffman = new ArrayList<>();
-		for(int i=0;i < 256; i++){
-			if(arr[i].getN()!=0){
-				HuffmanInfo info = new HuffmanInfo();
-				info.setC(Integer.parseInt(arr[i].getCod()));
-				info.setN(arr[i].getN());
-				listahuffman.add(info);
-			}
-		}
-		Collections.sort(listahuffman, Comparator.comparingInt(HuffmanInfo::getN));
-		
-		return listahuffman;
-	}
+	public List<HuffmanInfo> crearListaEnlazada(HuffmanTable arr[]) {
+    List<HuffmanInfo> listahuffman = new ArrayList<>();
+    for (int i = 0; i < 256; i++) {
+        if (arr[i].getN() != 0) { // Asegúrate de que haya ocurrencias
+            HuffmanInfo info = new HuffmanInfo();
+            String cod = arr[i].getCod().trim(); // Elimina espacios en blanco
+
+            // Intenta analizar solo si getCod() no es una cadena vacía
+            if (!cod.isEmpty()) {
+                try {
+                    info.setC(cod.charAt(0));
+                } catch (NumberFormatException e) {
+                    System.err.println("Error al convertir cod: " + cod);
+                    info.setC(i); // Usa el índice 'i' como valor predeterminado si hay un error
+                }
+            } else {
+                info.setC(i); // Usa el índice 'i' como valor predeterminado si getCod() está vacío
+            }
+            info.setN(arr[i].getN());
+            listahuffman.add(info);
+        }
+    }
+    Collections.sort(listahuffman, Comparator.comparingInt(HuffmanInfo::getN));
+
+    return listahuffman;
+}
 	
 	// Convierte la lista en el árbol Huffman
 	@Override
