@@ -1,6 +1,7 @@
 package imple;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,19 +17,19 @@ public class DescompImple implements Descompresor {
     @Override
     public long recomponerArbol(String filename, HuffmanInfo arbol) {
         long bytesLeidos = 0;
+        boolean hayMasDatos = true;
         try (DataInputStream in = new DataInputStream(new FileInputStream(filename + ".huf"))) {
-            while (in.available() > 0) {
+            while (hayMasDatos) {
                 // Leer el valor del carácter como un entero
                 int n = in.readInt();
                 bytesLeidos += 4;
 
                 // Lee la longitud del código de Huffman (cantidad de bits)
-				
                 // Lee el código de Huffman
                 int codeLength = in.readInt(); // Leer la longitud del código
                 bytesLeidos += 4;
                 byte[] codeBytes = new byte[codeLength];
-				in.readFully(codeBytes);
+                in.readFully(codeBytes);
                 String huffmanCode = new String(codeBytes);
                 bytesLeidos += codeLength;
 
@@ -53,7 +54,7 @@ public class DescompImple implements Descompresor {
                 currentNode.setC(n);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            hayMasDatos=false;
         }
 
         return bytesLeidos;
@@ -99,3 +100,11 @@ public class DescompImple implements Descompresor {
         }
     }
 }
+
+/*
+Manejo de excepciones: En el método recomponerArbol, se imprime la traza de la excepción, pero no se maneja de otra manera. Considera lanzar la excepción o manejarla de forma que el programa pueda recuperarse.
+
+Validación de entrada: No hay validaciones para el archivo que se está abriendo. Asegúrate de que el archivo existe y es accesible antes de intentar leerlo.
+
+Lectura de códigos Huffman: Asegúrate de que los códigos Huffman leídos son válidos y corresponden a los caracteres esperados.
+*/
