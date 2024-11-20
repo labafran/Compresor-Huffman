@@ -8,8 +8,8 @@ import huffman.def.BitWriter;
 public class BitWriterImple implements BitWriter 
 {
 	private OutputStream archivo;
-    private int bitCount; 
-    private byte a = 0;
+    public int bitCount; 
+    public byte a = 0;
     
     @Override
     public void using(OutputStream os)

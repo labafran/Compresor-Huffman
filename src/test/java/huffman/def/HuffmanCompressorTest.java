@@ -1,60 +1,47 @@
+//TODO LIST
+//1. Revisar por qué se descomprime "desordenado" si por separado lee bien, recorre el arbol bien y escribe bien los bits
+//2. Aplicar Console (huffman/util/Console.java) en vez de estar usando el console por defecto
+
+
+
+
 package huffman.def;
 
 
-import java.io.File;
+import java.io.Console;
 import java.util.List;
-import java.util.Scanner;
 
 import imple.CompresorImple;
+import imple.DescompImple;
 
 public class HuffmanCompressorTest {
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Seleccione una opción:");
-        System.out.println("0. Cerrar Programa");
-        System.out.println("1. Comprimir archivo");
-        System.out.println("2. Descomprimir archivo");
-        int opcion = scanner.nextInt();
-        scanner.nextLine(); // Limpiar el buffer
+        Console console = System.console();
+        console.printf("Seleccione una opción:\n0. Cerrar Programa\n1. Comprimir archivo\n2. Descomprimir archivo\n");
+        int opcion = Integer.parseInt(console.readLine());
         while (opcion != 0) {
-            System.out.print("Ingrese la ruta y el nombre del archivo (ejemplo: archivo.txt): ");
-            String filename = scanner.nextLine();
+            String filename = console.readLine("Introduzca el nombre del archivo (con extensión, por ejemplo test.txt): ");
 
-            File file = new File(filename);
 
             switch (opcion) {
-                case 1:
-                    if (file.exists()) {
-                        System.out.println("Compresion del archivo: " + filename);
-                        comprimirArchivo(filename);
-                    } else {
-                        System.out.println("El archivo no existe.");
-                    }
-                    break;
+                case 1 -> {
+                    System.out.println("Compresion del archivo: " + filename);
+                    comprimirArchivo(filename);
+                }
 
-                /*case 2:
-                    if (file.exists()) {
-                        System.out.println("Descompresion del archivo: " + filename);
-                        descomprimirArchivo(filename);
-                    } else {
-                        System.out.println("El archivo no existe.");
-                    }
-
-                    break;*/
-                default:
-                    System.out.println("Opción no válida. Por favor ingrese una opción válida.");
-
-                    break;
+                case 2 -> {
+                    System.out.println("Descompresion del archivo: " + filename);
+                    descomprimirArchivo(filename);
+                }
+                default -> System.out.println("Opción no válida. Por favor ingrese una opción válida.");
             }
             System.out.println("Seleccione una opción:");
             System.out.println("0. Cerrar Programa");
             System.out.println("1. Comprimir archivo");
             System.out.println("2. Descomprimir archivo");
-            opcion = scanner.nextInt();
-            scanner.nextLine(); // Limpiar el buffer
+            opcion = Integer.parseInt(console.readLine());
         }
-        scanner.close();
 
     }
 
@@ -69,9 +56,10 @@ public class HuffmanCompressorTest {
         compresor.escribirContenido(filename, ocurrencias);
     }
 
-/*     public static void descomprimirArchivo(String filename) {
+     public static void descomprimirArchivo(String filename) {
         DescompImple descompresor = new DescompImple();
-        long bytesLeidos = descompresor.recomponerArbol(filename, arbol);
+        HuffmanInfo arbol = new HuffmanInfo();
+        long bytesLeidos = descompresor.recomponerArbol(filename, arbol); // HASTA ACÁ 100% PERFECTO!!!!!!
         descompresor.descomprimirArchivo(arbol, bytesLeidos, filename);
-    }*/
+    }
 }

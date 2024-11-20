@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="huffman.def.BitWriterTest" time="0.047" tests="2" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="huffman.def.BitWriterTest" time="0.041" tests="2" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="22"/>
     <property name="sun.cpu.isalist" value="amd64"/>
     <property name="sun.jnu.encoding" value="Cp1252"/>
-    <property name="java.class.path" value="C:\Users\Fran\Desktop\TPFinalAlgoritmos\target\test-classes;C:\Users\Fran\Desktop\TPFinalAlgoritmos\target\classes;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter\5.8.1\junit-jupiter-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.8.1\junit-jupiter-api-5.8.1.jar;C:\Users\Fran\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\Fran\.m2\repository\org\junit\platform\junit-platform-commons\1.8.1\junit-platform-commons-1.8.1.jar;C:\Users\Fran\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.8.1\junit-jupiter-params-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.8.1\junit-jupiter-engine-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\platform\junit-platform-engine\1.8.1\junit-platform-engine-1.8.1.jar;"/>
+    <property name="java.class.path" value="C:\Users\Fran\Desktop\TPFinalAlgoritmos\target\test-classes;C:\Users\Fran\Desktop\TPFinalAlgoritmos\target\classes;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter\5.8.1\junit-jupiter-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.8.1\junit-jupiter-api-5.8.1.jar;C:\Users\Fran\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\Fran\.m2\repository\org\junit\platform\junit-platform-commons\1.8.1\junit-platform-commons-1.8.1.jar;C:\Users\Fran\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.8.1\junit-jupiter-params-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.8.1\junit-jupiter-engine-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\platform\junit-platform-engine\1.8.1\junit-platform-engine-1.8.1.jar;C:\Users\Fran\.m2\repository\com\google\code\gson\gson\2.8.8\gson-2.8.8.jar;"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="user.variant" value=""/>
@@ -15,10 +15,10 @@
     <property name="user.country" value="AR"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-22\bin"/>
-    <property name="sun.java.command" value="C:\Users\Fran\AppData\Local\Temp\surefire9305868181080588896\surefirebooter-20241113092702589_3.jar C:\Users\Fran\AppData\Local\Temp\surefire9305868181080588896 2024-11-13T09-27-01_969-jvmRun1 surefire-20241113092702589_1tmp surefire_0-20241113092702589_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\Fran\AppData\Local\Temp\surefire524283340031167498\surefirebooter-20241118084358701_3.jar C:\Users\Fran\AppData\Local\Temp\surefire524283340031167498 2024-11-18T08-43-58_573-jvmRun1 surefire-20241118084358701_1tmp surefire_0-20241118084358701_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="test" value="huffman.def.BitWriterTest"/>
-    <property name="surefire.test.class.path" value="C:\Users\Fran\Desktop\TPFinalAlgoritmos\target\test-classes;C:\Users\Fran\Desktop\TPFinalAlgoritmos\target\classes;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter\5.8.1\junit-jupiter-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.8.1\junit-jupiter-api-5.8.1.jar;C:\Users\Fran\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\Fran\.m2\repository\org\junit\platform\junit-platform-commons\1.8.1\junit-platform-commons-1.8.1.jar;C:\Users\Fran\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.8.1\junit-jupiter-params-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.8.1\junit-jupiter-engine-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\platform\junit-platform-engine\1.8.1\junit-platform-engine-1.8.1.jar;"/>
+    <property name="surefire.test.class.path" value="C:\Users\Fran\Desktop\TPFinalAlgoritmos\target\test-classes;C:\Users\Fran\Desktop\TPFinalAlgoritmos\target\classes;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter\5.8.1\junit-jupiter-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.8.1\junit-jupiter-api-5.8.1.jar;C:\Users\Fran\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\Fran\.m2\repository\org\junit\platform\junit-platform-commons\1.8.1\junit-platform-commons-1.8.1.jar;C:\Users\Fran\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.8.1\junit-jupiter-params-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.8.1\junit-jupiter-engine-5.8.1.jar;C:\Users\Fran\.m2\repository\org\junit\platform\junit-platform-engine\1.8.1\junit-platform-engine-1.8.1.jar;C:\Users\Fran\.m2\repository\com\google\code\gson\gson\2.8.8\gson-2.8.8.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="C:\Users\Fran"/>
     <property name="user.language" value="es"/>
@@ -31,7 +31,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\Fran\AppData\Local\Temp\surefire9305868181080588896\surefirebooter-20241113092702589_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\Fran\AppData\Local\Temp\surefire524283340031167498\surefirebooter-20241118084358701_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="22.0.2+9-70"/>
@@ -60,6 +60,6 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="66.0"/>
   </properties>
-  <testcase name="test1" classname="huffman.def.BitWriterTest" time="0.029"/>
-  <testcase name="test2" classname="huffman.def.BitWriterTest" time="0.002"/>
+  <testcase name="test1" classname="huffman.def.BitWriterTest" time="0.023"/>
+  <testcase name="test2" classname="huffman.def.BitWriterTest" time="0.003"/>
 </testsuite>

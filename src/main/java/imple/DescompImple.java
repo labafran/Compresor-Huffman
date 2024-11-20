@@ -1,62 +1,75 @@
 package imple;
 
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
-import huffman.def.BitReader;
 import huffman.def.Descompresor;
 import huffman.def.HuffmanInfo;
 
 public class DescompImple implements Descompresor {
+
+    private BitReaderImple bitReader;
+
+    public DescompImple() {
+        this.bitReader = new BitReaderImple(); // Inicializa bitReader
+    }
 // ** en todos los casos filename es el nombre del archivo original **
 
     // Restaura el árbol leyendo el encabezado desde el archivo filename+".huf" 
     @Override
     public long recomponerArbol(String filename, HuffmanInfo arbol) {
         long bytesLeidos = 0;
-        boolean hayMasDatos = true;
+        arbol.setC(300); // Le doy un valor de NO hoja a la raíz 
         try (DataInputStream in = new DataInputStream(new FileInputStream(filename + ".huf"))) {
-            while (hayMasDatos) {
-                // Leer el valor del carácter como un entero
-                int n = in.readInt();
-                bytesLeidos += 4;
+            bitReader.using(in);
+            int cantHojas = in.read(); //Leo la cantidad de hojas
+            bytesLeidos++;
+            for(int i=0; i<cantHojas; i++) { // Por cada hoja...
+                char c = (char) in.read(); // Leo el caracter
+                bytesLeidos++;
+                int  cantBits = in.read(); // Leo la cantidad de bits del código Huffman
+                bytesLeidos++;
+                int bit;
+                StringBuilder codigo = new StringBuilder();
+                for(int j=0; j<cantBits; j++){
+                    bit = bitReader.readBit(); // Leo cada bit del código
+                    codigo.append(bit); // Cuando completo un byte lo agrego al string
+                }
+                bytesLeidos += Math.ceil((float)cantBits/8); // Redondeo hacia arriba la cantidad de bytes, si es 1.1 bytes sube a 2 bytes
 
-                // Lee la longitud del código de Huffman (cantidad de bits)
-                // Lee el código de Huffman
-                int codeLength = in.readInt(); // Leer la longitud del código
-                bytesLeidos += 4;
-                byte[] codeBytes = new byte[codeLength];
-                in.readFully(codeBytes);
-                String huffmanCode = new String(codeBytes);
-                bytesLeidos += codeLength;
+                if (cantBits%8!=0) {
+                    bitReader.flush();
+                }
+                String camino = codigo.toString();
+                HuffmanInfo aux = arbol; //Creo un aux para recorrer el arbol
 
-                // Insertar el carácter en el árbol
-                HuffmanInfo currentNode = arbol;
-                for (char bit : huffmanCode.toCharArray()) {
-                    if (bit == '0') {
-                        // Ir a la izquierda o crear nodo izquierdo
-                        if (currentNode.getLeft() == null) {
-                            currentNode.setLeft(new HuffmanInfo());
+                for(int j=0; j<camino.length(); j++){
+                    if(camino.charAt(j)=='1'){ //Si es 1 reviso la rama derecha
+
+                        if(aux.getRight()==null){ //Si no tiene rama derecha, la creo
+                            aux.setRight(new HuffmanInfo());
+                            aux.getRight().setC(300); // Le asigno el caracter 300 a lo que no sea hoja
                         }
-                        currentNode = currentNode.getLeft();
-                    } else if (bit == '1') {
-                        // Ir a la derecha o crear nodo derecho
-                        if (currentNode.getRight() == null) {
-                            currentNode.setRight(new HuffmanInfo());
+                        aux = aux.getRight(); // Me muevo a la rama derecha
+                            
+                    }else if(camino.charAt(j)=='0'){ //Si es 0, reviso la rama izquierda
+                        if(aux.getLeft()==null){ //Si no tiene rama izquierda, la creo
+                            aux.setLeft(new HuffmanInfo());
+                            aux.getLeft().setC(300); // Le asigno el caracter 300 a lo que no sea hoja
+
                         }
-                        currentNode = currentNode.getRight();
+                        aux = aux.getLeft(); // Me muevo a la rama izquierda
                     }
                 }
-                // Asignar el carácter al nodo hoja final
-                currentNode.setC(n);
-            }
-        } catch (IOException e) {
-            hayMasDatos=false;
+                aux.setC((int) c); // Al llegar a la hoja, le asigno el caracter
+            }                    
+        } catch (IOException e){
+            System.out.println("Error al leer el archivo");
+            e.printStackTrace();
         }
-
         return bytesLeidos;
     }
 
@@ -64,47 +77,38 @@ public class DescompImple implements Descompresor {
     // cada byte decodificado en el arhivo filename
     @Override
     public void descomprimirArchivo(HuffmanInfo root, long n, String filename) {
-
-        try (FileInputStream in = new FileInputStream(filename + ".huf"); FileOutputStream out = new FileOutputStream(filename)) {
-
-            BitReader bitReader = new BitReaderImple();
-            bitReader.using(in);  // Configura el BitReader para leer del archivo comprimido
-            HuffmanInfo currentNode = root;
-            long bytesWritten = 0;
-
-            // Leer bit a bit hasta alcanzar el número esperado de bytes decodificados
-            while (bytesWritten < n) {
-                int bit = bitReader.readBit();
-
-                // Verificar si se ha alcanzado el final del archivo
-                if (bit == -1) {
-                    break;
-                }
-
-                // Navegar por el árbol de Huffman usando el bit leído
-                if (bit == 0) {
-                    currentNode = currentNode.getLeft();
-                } else if (bit == 1) {
-                    currentNode = currentNode.getRight();
-                }
-
-                // Si llegamos a un nodo hoja, escribimos el carácter decodificado
-                if (currentNode.getLeft() == null && currentNode.getRight() == null) {
-                    out.write(currentNode.getC());  // Escribir el carácter en el archivo de salida
-                    bytesWritten++;
-                    currentNode = root;  // Reiniciar al nodo raíz para el siguiente símbolo
-                }
+        try (DataInputStream in = new DataInputStream(new FileInputStream(filename + ".huf")); PrintWriter out = new PrintWriter(new FileWriter(filename))) {
+            bitReader.using(in);
+            for(int i=0;i<n;i++){
+                in.readByte(); // Ignoro el encabezado
             }
-        } catch (IOException e) {
+            int largoArchivo = in.readInt();
+            HuffmanInfo aux = root;
+            int cont=0;
+            int bit=bitReader.readBit();
+            cont++;
+            while(bit!=-1 && largoArchivo>=0){
+
+                if(aux.getC()==300){
+                    if(bit==1){
+                        aux = aux.getRight();
+                    }else{
+                        aux = aux.getLeft();
+                    }
+                }else{
+                    out.write((char) aux.getC());
+                    largoArchivo--;
+                    aux = root;
+                }
+
+                bit = bitReader.readBit();
+                cont++;
+            }
+
+
+        } catch (IOException e){
+            System.out.println("Error al leer el archivo");
             e.printStackTrace();
         }
     }
 }
-
-/*
-Manejo de excepciones: En el método recomponerArbol, se imprime la traza de la excepción, pero no se maneja de otra manera. Considera lanzar la excepción o manejarla de forma que el programa pueda recuperarse.
-
-Validación de entrada: No hay validaciones para el archivo que se está abriendo. Asegúrate de que el archivo existe y es accesible antes de intentar leerlo.
-
-Lectura de códigos Huffman: Asegúrate de que los códigos Huffman leídos son válidos y corresponden a los caracteres esperados.
-*/

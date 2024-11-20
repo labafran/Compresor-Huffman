@@ -18,7 +18,7 @@ public class CompresorImple implements Compresor {
     private BitWriterImple bitWriter;
 
     public CompresorImple() {
-        this.bitWriter = new BitWriterImple(); // Initialize bitWriter here
+        this.bitWriter = new BitWriterImple(); // Inicializa bitWriter
     }
     
 
@@ -28,76 +28,74 @@ public class CompresorImple implements Compresor {
         HuffmanTable[] huffmantable = new HuffmanTable[256];
 
         for (int i = 0; i < 256; i++) {
-            huffmantable[i] = new HuffmanTable();
-            huffmantable[i].setCod(Character.toString((char) i));
-            huffmantable[i].setN(0);//pone la ocurrencia en 0
+            huffmantable[i] = new HuffmanTable(); // Inicializo el array
+            huffmantable[i].setCod(Character.toString((char) i)); // Ingreso el char como un string
+            huffmantable[i].setN(0); //Setea la ocurrencia en 0
         }
-        try (FileInputStream archivo = new FileInputStream(filename)) {
+        try (FileInputStream archivo = new FileInputStream(filename)) { // Abro el archivo
             int buffer;
-            buffer = archivo.read();
-            while (buffer > -1) {
-                huffmantable[buffer].increment();
-                buffer = archivo.read();
+            buffer = archivo.read(); // Leo el primer byte
+            while (buffer > -1) { //Mientras no sea el último...
+                huffmantable[buffer].increment(); // Incremento las ocurrencias en 1
+                buffer = archivo.read(); // Vuelvo a leer
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return huffmantable;
+        return huffmantable; // Retorno la tabla de 256 carácteres con sus respectivas ocurrencias
     }
 
     // Retorna una lista ordenada donde cada nodo representa a cada byte del archivo
     @Override
     public List<HuffmanInfo> crearListaEnlazada(HuffmanTable arr[]) {
-        List<HuffmanInfo> listahuffman = new ArrayList<>();
-        for (int i = 0; i < 256; i++) {
-            if (arr[i].getN() != 0) { // Asegúrate de que haya ocurrencias
+        List<HuffmanInfo> listahuffman = new ArrayList<>(); // Inicializo la lista
+        for (int i = 0; i < 256; i++) { // Recorro todo el array
+            if (arr[i].getN() != 0) { // Si tiene una ocurrencia...
                 HuffmanInfo info = new HuffmanInfo();
-                String cod = arr[i].getCod();
+                String cod = arr[i].getCod(); // Seteo el código
 
-                // Intenta analizar solo si getCod() no es una cadena vacía
-                if (!cod.isEmpty()) {
+                if (!cod.isEmpty()) { // Si el código no está vacío
                     try {
-                        info.setC(cod.charAt(0));
+                        info.setC(cod.charAt(0)); // Seteo el carácter
                     } catch (NumberFormatException e) {
                         System.err.println("Error al convertir cod: " + cod);
-                        info.setC(i); // Usa el índice 'i' como valor predeterminado si hay un error
                     }
-                } else {
-                    info.setC(i); // Usa el índice 'i' como valor predeterminado si getCod() está vacío
                 }
-                info.setN(arr[i].getN());
-                listahuffman.add(info);
+                info.setN(arr[i].getN()); // Seteo la ocurrencia
+                listahuffman.add(info); // Añado a la lista
             }
         }
-        Collections.sort(listahuffman, Comparator.comparingInt(HuffmanInfo::getN));
+        Collections.sort(listahuffman, Comparator.comparingInt(HuffmanInfo::getN)); // Ordeno la lista ponderada por la ocurrencias
 
-        return listahuffman;
+        return listahuffman; // Retorno la lista
     }
 
     // Convierte la lista en el árbol Huffman
     @Override
     public HuffmanInfo convertirListaEnArbol(List<HuffmanInfo> lista) {
         if (lista == null || lista.isEmpty()) {
-            return null;
+            System.out.println("La lista está vacía.");
+            return null; // Si la lista está vacía, retorno null
         }
 
-        while (lista.size() > 1) {
+        while (lista.size() > 1) { // Mientras haya más de un elemento en la lista, continúo generando el árbol
+
             HuffmanInfo padre = new HuffmanInfo();
-            HuffmanInfo der = lista.remove(0);
+            HuffmanInfo der = lista.remove(0); // Elimino de la lista y añado a la rama derecha en el arbol arbol
             padre.setRight(der);
-            HuffmanInfo izq = lista.remove(0);
+            HuffmanInfo izq = lista.remove(0); // Elimino de la lista y añado a la rama izquierda en el arbol arbol
             padre.setLeft(izq);
-            padre.setN(der.getN() + izq.getN());
-            padre.setC(300); // 300 = raiz
-            lista.add(padre);
-            Collections.sort(lista, Comparator.comparingInt(HuffmanInfo::getN));
-            System.out.println("Tamaño de la lista: " + lista.size());
-            System.out.println("Valor de la raíz: " + padre.getN());
+
+            padre.setN(der.getN() + izq.getN()); // Sumo las ocurrencias de los hijos y se la seteo al padre
+            padre.setC(300); // Le doy un caracter más allá de 256 para distinguir de las hojas
+            lista.add(padre);  // Añado el padre a la lista
+            Collections.sort(lista, Comparator.comparingInt(HuffmanInfo::getN)); // Vuelvo a ordenar la lista para mantenerla ordenada
+
         }
 
-        return lista.get(0);
+        return lista.get(0); // Devuelvo el árbol armado
     }
 
     // Recorre el árbol Huffman y completa los códigos en el array
@@ -109,58 +107,68 @@ public class CompresorImple implements Compresor {
 
         // Llamada a next para cada hoja, que genera el código Huffman y lo almacena en `cod`
         for (HuffmanInfo x = arbolito.next(cod); x != null; x = arbolito.next(cod)) {
-            int byteValue = x.getC();
-            arr[byteValue].setCod(cod.toString());
-
-            // Imprime el carácter y su código
-            System.out.println("Caracter: " + (char) byteValue + " - Código: " + cod);
+            int byteValue = x.getC(); // Obtengo el código de Huffman desde el árbol
+            arr[byteValue].setCod(cod.toString()); // Paso el código de Huffman al array
         }
     }
 
     // Escribe el encabezado en el archivo filename+".huf", y retorna cuántos bytes ocupa el encabezado
     @Override
     public long escribirEncabezado(String filename, HuffmanTable arr[]) {
-        long headerSize = 0;
-
-        //Busco la altura del arbol
-        int alturaArbol = 0;
+        long headerSize = 0; // Almacena el largo del encabezado
+        int largoArchivo=0; // Almacena el largo del archivo = Suma de ocurrencias de todos los carácteres
+        int cantidadHojas=0; // Almacena la cantidad de hojas en el arbol
         for (int i = 0; i < arr.length; i++) {
-            if (alturaArbol < arr[i].getCod().length()) { //Busco el código más largo, que representa la hoja más baja, haciendo que el largo equivalga al nivel de la hoja
-                alturaArbol = arr[i].getCod().length(); //Si el código es más largo, actualizo la altura
+            if(arr[i].getN()>0){
+                cantidadHojas++; // Cuento la cantidad de hojas
             }
         }
+
         //Creo el archivo .huf
         try (DataOutputStream out = new DataOutputStream(new FileOutputStream(filename + ".huf"))) {
-            //Escribo la altura del arbol
-            out.writeInt(alturaArbol);
-            //Recorro el array
-            for (int i = 0; i < arr.length; i++) {
-                if (arr[i].getN() > 0) { //Si está en el array, lo agrego en el archivo, sino lo ignoro
-                    out.writeByte((byte) i);  //Escribo el valor ASCII del caracter
+            bitWriter.using(out);
+            out.writeByte(cantidadHojas); // Escribo la cantidad de hojas
+            headerSize++;            
+            
+            for (int i = 0; i < arr.length; i++) { // Recorro el array
+
+                if (arr[i].getN()>0) { // Si está en el array, lo agrego en el archivo, sino lo ignoro
+
+                    out.writeByte((byte) i);  // Escribo el valor ASCII del caracter
+                    headerSize++;
+                    
                     out.writeByte((byte) arr[i].getCod().length()); //Escribo el largo del código
+                    headerSize++;
+
                     //Escribo los bits del codigo...
-                    byte[] bytes = new byte[(arr[i].getCod().length() + 7) / 8]; // Calcular la cantidad de bytes necesarios para el código
-                    for (int j = 0; j < arr[i].getCod().length(); j++) { //Escribo bit a bit
-                        if (arr[i].getCod().charAt(j) == '1' && arr[i].getN()>0) {
-                            bytes[j / 8] |= (1 << (7 - (j % 8))); // Establecer el bit correspondiente
+                    byte[] bytes = new byte[(arr[i].getCod().length() + 7) / 8]; // Calcula la cantidad de bytes necesarios para el código
+
+                    for (int j = 0; j < arr[i].getCod().length(); j++) { // Escribe bit a bit hasta llegar al final del código de Huffman
+                        if (arr[i].getCod().charAt(j) == '1') {
+                            bitWriter.writeBit(1);
+                        }else{
+                            bitWriter.writeBit(0);
                         }
                     }
-                    out.write(bytes);
+                    headerSize+= Math.ceil((float)arr[i].getCod().length()/8);
+                    
+
                     if(arr[i].getCod().length()%8!=0){ //Si el largo del código no es multiplo de 8, hago flush
                         bitWriter.flush();
+                    }else{
+                        out.write(bytes); //Escribo el código en el archivo
                     }
+
+                    largoArchivo += arr[i].getN(); // Sumo todas las ocurrencias para calcular el largo del archivo
                 }
             }
-            int largoArchivo=0;
-            for(int i=0;i<arr.length;i++){
-                largoArchivo += arr[i].getN(); //Sumo todas las ocurrencias para calcular el largo del archivo
-            }
-            out.writeInt(largoArchivo); //Escribo el largo del archivo
+            out.writeInt(largoArchivo); // Escribo el largo del archivo
 
         }catch(IOException e) {
             e.printStackTrace();
         }
-        return headerSize ;
+        
+        return headerSize; // Retorno el largo del encabezado
     }
 
 // Recorre el archivo filename por cada byte escribe su código en filename+".huf"
@@ -171,19 +179,22 @@ public void escribirContenido(String filename, HuffmanTable arr[]) {
             bitWriter.using(out); // Configura el BitWriter para escribir en el archivo comprimido
 
             int byteValue;
-            // Leer cada byte del archivo de entrada
-            while ((byteValue = in.read()) != -1) {
+            int cont=0;
+            
+            while ((byteValue = in.read()) != -1) { // Leer cada byte del archivo de entrada
+                
                 // Buscar el código de Huffman correspondiente en la tabla
                 String huffmanCode = arr[byteValue].getCod();
 
                 // Escribir el código en el archivo de salida
                 for (char bit : huffmanCode.toCharArray()) {
                     bitWriter.writeBit(Character.getNumericValue(bit)); // Escribir cada bit
+                    cont++;
                 }
             }
-
-            // Asegúrate de que todos los bits se escriban antes de cerrar el flujo
-            bitWriter.flush(); // Llama a flush para escribir cualquier bit restante
+            if(cont%8!=0){
+                bitWriter.flush(); // En caso de no haber completado un byte (no es divisible por 8), hago flush
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -31,8 +31,7 @@ public class BitReaderImple implements BitReader
         if (buffer == -1) {
             return -1;
 		}
-
-         bitPos = 0;
+        bitPos = 0;
       }
      
       int bit = (buffer >> (7 - bitPos)) & 1;
@@ -45,7 +44,9 @@ public class BitReaderImple implements BitReader
 	@Override
 	public void flush()
 	{
-		buffer=0;
-		bitPos=8;
+		if(bitPos%8!=0){
+			buffer=0;
+			bitPos=8;
+		}
 	}
 }
