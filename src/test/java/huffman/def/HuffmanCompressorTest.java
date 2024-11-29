@@ -12,7 +12,7 @@ import java.io.Console;
 import java.util.List;
 
 import imple.CompresorImple;
-import imple.DescompImple;
+import imple.Descompresor2Imple;
 
 public class HuffmanCompressorTest {
 
@@ -57,7 +57,7 @@ public class HuffmanCompressorTest {
     }
 
      public static void descomprimirArchivo(String filename) {
-        DescompImple descompresor = new DescompImple();
+        Descompresor2Imple descompresor = new Descompresor2Imple();
         HuffmanInfo arbol = new HuffmanInfo();
         long bytesLeidos = descompresor.recomponerArbol(filename, arbol); // HASTA ACÁ 100% PERFECTO!!!!!!
         descompresor.descomprimirArchivo(arbol, bytesLeidos, filename);

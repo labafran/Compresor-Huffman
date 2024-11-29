@@ -26,18 +26,17 @@ public class BitReaderImple implements BitReader
         		buffer = archivo.read();
         	} catch (IOException e) {
             	e.printStackTrace();
-        }
-
-        if (buffer == -1) {
-            return -1;
-		}
-        bitPos = 0;
-      }
+        	}
+        	if (buffer == -1) {
+            	return -1;
+			}
+        	bitPos = 0;
+      	}
      
-      int bit = (buffer >> (7 - bitPos)) & 1;
-      bitPos++;
+    	int bit = (buffer >> (7 - bitPos)) & 1;
+    	bitPos++;
 	  
-      return bit;
+    	return bit;
 	
 	}
 	

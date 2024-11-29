@@ -9,27 +9,27 @@ import java.io.PrintWriter;
 import huffman.def.Descompresor;
 import huffman.def.HuffmanInfo;
 
-public class DescompImple implements Descompresor {
-
+public class Descompresor2Imple implements Descompresor {
     private BitReaderImple bitReader;
-
-    public DescompImple() {
+   
+    public Descompresor2Imple() {
         this.bitReader = new BitReaderImple(); // Inicializa bitReader
     }
+    
     // ** en todos los casos filename es el nombre del archivo original **
-    // Restaura el arbol leyendo el encabezado desde el archivo filename+".huf" 
+    // Restaura el arbol leyendo el encabezado desde el archivo filename+".huf"
     @Override
-    public long recomponerArbol(String filename, HuffmanInfo arbol) {
+    public long recomponerArbol(String filename,HuffmanInfo arbol){
         long bytesLeidos = 0;
         arbol.setC(300); // Le doy un valor de NO hoja a la raíz 
         try (DataInputStream in = new DataInputStream(new FileInputStream(filename + ".huf"))) {
             bitReader.using(in);
-            long cantHojas = in.readByte(); //Leo la cantidad de hojas
+            int cantHojas = in.readByte(); //Leo la cantidad de hojas
             bytesLeidos++;
             for(int i=0; i<cantHojas; i++) { // Por cada hoja...
                 char c = (char) in.readByte(); // Leo el caracter
                 bytesLeidos++;
-                long cantBits = in.readByte(); // Leo la cantidad de bits del codigo Huffman
+                int cantBits = in.readByte(); // Leo la cantidad de bits del codigo Huffman
                 bytesLeidos++;
                 int bit;
                 StringBuilder codigo = new StringBuilder();
@@ -70,37 +70,39 @@ public class DescompImple implements Descompresor {
         return bytesLeidos;
     }
 
-    // Recorre bit por bit el archivo filename+".huf", decodifica y escribe cada byte decodificado en el arhivo filename
     @Override
-    public void descomprimirArchivo(HuffmanInfo root, long n, String filename) {
-        try (DataInputStream in = new DataInputStream(new FileInputStream(filename + ".huf")); PrintWriter out = new PrintWriter(new FileWriter(filename))) {
+	public void descomprimirArchivo(HuffmanInfo root,long n,String filename){
+        try (DataInputStream in = new DataInputStream(new FileInputStream(filename+".huf")); PrintWriter out = new PrintWriter(new FileWriter(filename))){
+
             bitReader.using(in);
             for(int i=0;i<n;i++){
-                in.readByte(); // Ignoro el encabezado
+                in.readByte();
             }
-            int largoArchivo = in.readInt(); // Leo los 4 bytes que indican el largo del archivo
-            HuffmanInfo aux = root;
-            int bit=bitReader.readBit();
-            while(largoArchivo>0){ // Leo hasta que termine el archivo
 
-                if(aux.getC()==300){ // Si no es hoja voy a izq o derecha respectivamente
+            //Leido el cabezado, paso a leer la cantidad de caracteres del archivo
+            int longArchivo = in.readInt();
+            //Leo el contenido codificado hasta completar la longitud de archivo
+            HuffmanInfo arbolAux = root;
+            int bit = bitReader.readBit();
+            while(longArchivo>0){
+                
+                if(arbolAux.getC()==300){
                     if(bit==1){
-                        aux = aux.getRight();
+                        bit = bitReader.readBit();
+                        arbolAux = arbolAux.getRight();
                     }else{
-                        aux = aux.getLeft();
+                        bit = bitReader.readBit();
+                        arbolAux = arbolAux.getLeft();
                     }
-                }else{ // Si es hoja, escribo el caracter y vuelvo a la raiz
-                    out.write((char) aux.getC());
-                    largoArchivo--;
-                    aux = root;
+                }else{
+                    out.write( (char) arbolAux.getC() ); //Escribo el caracter
+                    longArchivo--; // Resto 1 a la longitud del archivo, puesto que ya encontramos 1 caracter
+                    arbolAux = root; // Vuelvo a la raiz para iterar nuevamente
                 }
-
-                bit = bitReader.readBit();
             }
-            bitReader.flush();
 
-
-        } catch (IOException e){
+            
+        } catch (IOException e) {
             System.out.println("Error al leer el archivo");
             e.printStackTrace();
         }
