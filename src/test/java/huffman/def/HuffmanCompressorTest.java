@@ -1,9 +1,6 @@
 //TODO LIST
-//1. Revisar por qué se descomprime "desordenado" si por separado lee bien, recorre el arbol bien y escribe bien los bits
+//1. Revisar xq no admite otros formatos de archivo
 //2. Aplicar Console (huffman/util/Console.java) en vez de estar usando el console por defecto
-
-
-
 
 package huffman.def;
 
@@ -12,17 +9,19 @@ import java.io.Console;
 import java.util.List;
 
 import imple.CompresorImple;
-import imple.Descompresor2Imple;
+import imple.DescompresorImple;
+
 
 public class HuffmanCompressorTest {
 
     public static void main(String[] args) {
+
         Console console = System.console();
+
         console.printf("Seleccione una opción:\n0. Cerrar Programa\n1. Comprimir archivo\n2. Descomprimir archivo\n");
         int opcion = Integer.parseInt(console.readLine());
         while (opcion != 0) {
             String filename = console.readLine("Introduzca el nombre del archivo (con extensión, por ejemplo test.txt): ");
-
 
             switch (opcion) {
                 case 1 -> {
@@ -57,9 +56,9 @@ public class HuffmanCompressorTest {
     }
 
      public static void descomprimirArchivo(String filename) {
-        Descompresor2Imple descompresor = new Descompresor2Imple();
+        DescompresorImple descompresor = new DescompresorImple();
         HuffmanInfo arbol = new HuffmanInfo();
-        long bytesLeidos = descompresor.recomponerArbol(filename, arbol); // HASTA ACÁ 100% PERFECTO!!!!!!
+        long bytesLeidos = descompresor.recomponerArbol(filename, arbol);
         descompresor.descomprimirArchivo(arbol, bytesLeidos, filename);
     }
 }
