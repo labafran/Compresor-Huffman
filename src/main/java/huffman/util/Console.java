@@ -11,10 +11,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -45,6 +48,41 @@ public class Console
 	private CountDownLatch latch;
 	private TriFunction<Character,Integer,String,Character> currentMask = STRING;
 	private int currCaretPosition=0;
+	private boolean closeable = false;
+	
+	private int anyKey;
+	public int pressAnyKey()
+	{
+		return pressAnyKey(()->{},-1);
+	}
+	
+	public int pressAnyKey(Runnable r)
+	{
+		return pressAnyKey(r,-1);		
+	}
+	
+	public int pressAnyKey(int k)
+	{
+		return pressAnyKey(()->{},k);		
+	}
+
+	public int pressAnyKey(Runnable r,int k)
+	{
+		try
+		{
+			textArea.addKeyListener(new EscuchaAnyKey(r,k));
+			reading=true;
+			latch = new CountDownLatch(1);
+	        latch.await();
+
+			return anyKey;			
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
 	
 	// singleton
 	public static Console get()
@@ -81,8 +119,8 @@ public class Console
 		setProportionalSize(.7,frame,null);
 		center(frame,null);
 		
-		int defaultCloseOperation = closeable?JFrame.DISPOSE_ON_CLOSE:JFrame.DO_NOTHING_ON_CLOSE;
-		frame.setDefaultCloseOperation(defaultCloseOperation);	
+		this.closeable=closeable;
+		frame.addWindowListener(new EscuchaWindow());
 		
 		frame.setTitle("Console for: "+_getMainClass());
 	}		
@@ -218,6 +256,7 @@ public class Console
 		return x;
 	}
 	
+
 	public String readLowercaseString()
 	{
 		return _readString(LOWERCASE);
@@ -268,6 +307,7 @@ public class Console
 		     ||kc==KeyEvent.VK_ENTER;
 	}
 
+	
     private static String _getMainClass() 
     {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -312,20 +352,64 @@ public class Console
 		scrollPane.setBorder(null);
 	}
     
+    public class EscuchaAnyKey extends KeyAdapter 
+    {
+        private Runnable r;
+        private Integer k;
+
+        public EscuchaAnyKey(Runnable r, int key) {
+            this.r = r;
+            this.k = key<0?null:key;
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) 
+        {
+            anyKey = e.getKeyCode();
+            
+            // Consumir el evento para evitar la escritura en el JTextArea
+            e.consume();
+
+            if (anyKey == KeyEvent.VK_SHIFT || anyKey == KeyEvent.VK_CONTROL || anyKey == KeyEvent.VK_ALT || anyKey == KeyEvent.VK_ALT_GRAPH /*|| anyKey==KeyEvent.VK_ENTER*/) {
+                return;
+            }
+
+            if (k == null || k.equals(anyKey) || anyKey==10) {
+                reading = false;
+                e.getComponent().removeKeyListener(this);
+                latch.countDown();
+                r.run();
+            }
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {e.consume();}
+        
+        @Override
+        public void keyReleased(KeyEvent e) {e.consume();}
+    }
+    
+    private void _finalizarElPrograma()
+    {
+		int r = JOptionPane.showConfirmDialog(frame, "¿Esta acción finalizará el programa?", "Confirmación", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if( r==JOptionPane.YES_OPTION )
+		{
+			frame.setVisible(false);
+			frame.dispose();
+			System.exit(0);
+		}
+    }
+    
+    
 	class EscuchaKey implements KeyListener
 	{
 		private void _processKey(KeyEvent e)
 		{
 			if( e.isControlDown() && e.getKeyCode()==KeyEvent.VK_C || e.getKeyCode()==KeyEvent.VK_ESCAPE )
 			{
-				int r = JOptionPane.showConfirmDialog(frame, "¿Esta acción finalizará el programa?", "Confirmación", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-				if( r==JOptionPane.YES_OPTION )
-				{
-					frame.setVisible(false);
-					frame.dispose();
-					System.exit(0);
-				}
+				_finalizarElPrograma();
 			}
+			
 			
 			if( !reading )
 			{
@@ -351,7 +435,7 @@ public class Console
 //				textArea.append("\n");
 				int len = _getLenght();
 				_setCaretPosition(len);
-				reading =false;
+				reading = false;
 				latch.countDown();
 				return;
 			}
@@ -405,7 +489,6 @@ public class Console
 			}
 			
 			e.setKeyChar(c);
-
 		}				
 	}
 
@@ -417,6 +500,22 @@ public class Console
 			if( reading )
 			{
 				_setCaretPosition(inputPosition);
+			}
+		}
+	}
+	
+	class EscuchaWindow extends WindowAdapter
+	{
+		@Override
+		public void windowClosing(WindowEvent e)
+		{
+			if( closeable )
+			{
+				frame.setVisible(false);
+			}
+			else
+			{
+				_finalizarElPrograma();
 			}
 		}
 	}
@@ -505,5 +604,24 @@ public class Console
 	        Objects.requireNonNull(after);
 	        return (A a, B b, C c) -> after.apply(apply(a, b, c));
 	    }
+	}
+
+	public String fileExplorer()
+	{
+		return fileExplorer(".");
+	}
+	public String fileExplorer(String dir)
+	{
+		JFileChooser jfc = new JFileChooser(dir);
+		int rtdo = jfc.showOpenDialog(frame);
+		
+		return rtdo==JFileChooser.APPROVE_OPTION?jfc.getSelectedFile().getName():null;
+	}
+
+	public void closeAndExit()
+	{
+		frame.setVisible(false);
+		frame.dispose();
+		System.exit(0);
 	}
 }

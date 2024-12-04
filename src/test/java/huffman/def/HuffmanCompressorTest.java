@@ -1,11 +1,8 @@
-//Aplicar Console (huffman/util/Console.java) en vez de estar usando el console por defecto
-
 package huffman.def;
 
-
-import java.io.Console;
 import java.util.List;
 
+import huffman.util.Console;
 import imple.CompresorImple;
 import imple.DescompresorImple;
 
@@ -14,31 +11,32 @@ public class HuffmanCompressorTest {
 
     public static void main(String[] args) {
 
-        Console console = System.console();
+        Console console = Console.get();
 
-        console.printf("Seleccione una opción:\n0. Cerrar Programa\n1. Comprimir archivo\n2. Descomprimir archivo\n");
-        int opcion = Integer.parseInt(console.readLine());
+        console.println("Seleccione una opción:\n0. Cerrar Programa\n1. Comprimir archivo\n2. Descomprimir archivo\n");
+        int opcion = console.readlnInteger();
         while (opcion != 0) {
-            String filename = console.readLine("Introduzca el nombre del archivo (con extensión, por ejemplo test.txt): ");
 
             switch (opcion) {
                 case 1 -> {
-                    System.out.println("Compresion del archivo: " + filename);
+                    String filename = console.println("Seleccione un archivo").fileExplorer();
+                    console.println("Compresion del archivo: " + filename);
                     comprimirArchivo(filename);
+                    console.println("Compresion exitosa! \n\n\n\n");
                 }
 
                 case 2 -> {
-                    System.out.println("Descompresion del archivo: " + filename);
+                    String filename = console.println("Seleccione un archivo").fileExplorer();
+                    console.println("Descompresion del archivo: " + filename);
                     descomprimirArchivo(filename);
+                    console.println("Descompresion exitosa! \n\n\n\n");
                 }
-                default -> System.out.println("Opción no válida. Por favor ingrese una opción válida.");
+                default -> console.println("Opción no válida. Por favor ingrese una opción válida.");
             }
-            System.out.println("Seleccione una opción:");
-            System.out.println("0. Cerrar Programa");
-            System.out.println("1. Comprimir archivo");
-            System.out.println("2. Descomprimir archivo");
-            opcion = Integer.parseInt(console.readLine());
+            console.println("Seleccione una opción:\n0. Cerrar Programa\n1. Comprimir archivo\n2. Descomprimir archivo\n");
+            opcion = console.readlnInteger();
         }
+        console.closeAndExit();
 
     }
 
@@ -51,12 +49,15 @@ public class HuffmanCompressorTest {
         compresor.generarCodigosHuffman(arbol, ocurrencias);
         compresor.escribirEncabezado(filename, ocurrencias);
         compresor.escribirContenido(filename, ocurrencias);
+        
     }
 
      public static void descomprimirArchivo(String filename) {
+        filename = filename.substring(0, filename.lastIndexOf(".")); //Pasa el .huf como un archivo sin descomprimir para no tener que adaptar todo despues
         DescompresorImple descompresor = new DescompresorImple();
         HuffmanInfo arbol = new HuffmanInfo();
         long bytesLeidos = descompresor.recomponerArbol(filename, arbol);
         descompresor.descomprimirArchivo(arbol, bytesLeidos, filename);
+        
     }
 }
