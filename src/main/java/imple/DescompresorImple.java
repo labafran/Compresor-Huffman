@@ -1,10 +1,10 @@
 package imple;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import huffman.def.Descompresor;
 import huffman.def.HuffmanInfo;
@@ -78,8 +78,7 @@ public class DescompresorImple implements Descompresor {
 
     @Override
 	public void descomprimirArchivo(HuffmanInfo root,long n,String filename){
-        try (DataInputStream in = new DataInputStream(new FileInputStream(filename+".huf")); PrintWriter out = new PrintWriter(new FileWriter(filename))){
-
+        try (DataInputStream in = new DataInputStream(new FileInputStream(filename+".huf")); DataOutputStream out = new DataOutputStream(new FileOutputStream(filename))){
             bitReader.using(in);
             for(int i=0;i<n;i++){
                 in.readByte();
@@ -101,7 +100,7 @@ public class DescompresorImple implements Descompresor {
                         arbolAux = arbolAux.getLeft();
                     }
                 }else{
-                    out.write( (char) arbolAux.getC() ); //Escribo el caracter
+                    out.writeByte(arbolAux.getC()); //Escribo el caracter
                     longArchivo--; // Resto 1 a la longitud del archivo, puesto que ya encontramos 1 caracter
                     arbolAux = root; // Vuelvo a la raiz para iterar nuevamente
                 }

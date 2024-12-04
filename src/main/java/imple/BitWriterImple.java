@@ -33,7 +33,7 @@ public class BitWriterImple implements BitWriter
             } catch (IOException e) {
                 e.printStackTrace();
            }
-            }
+        }
     }
         
     @Override

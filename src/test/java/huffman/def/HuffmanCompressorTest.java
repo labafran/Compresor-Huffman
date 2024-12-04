@@ -1,6 +1,4 @@
-//TODO LIST
-//1. Revisar xq no admite otros formatos de archivo
-//2. Aplicar Console (huffman/util/Console.java) en vez de estar usando el console por defecto
+//Aplicar Console (huffman/util/Console.java) en vez de estar usando el console por defecto
 
 package huffman.def;
 
