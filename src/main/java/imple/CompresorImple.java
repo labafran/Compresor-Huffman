@@ -133,8 +133,6 @@ public class CompresorImple implements Compresor {
                     headerSize++;
 
                     //Escribo los bits del codigo...
-                    byte[] bytes = new byte[(arr[i].getCod().length() + 7) / 8]; // Calcula la cantidad de bytes necesarios para el código
-
                     for (int j = 0; j < arr[i].getCod().length(); j++) { // Escribe bit a bit hasta llegar al final del código de Huffman
                         if (arr[i].getCod().charAt(j) == '1') {
                             bitWriter.writeBit(1);
