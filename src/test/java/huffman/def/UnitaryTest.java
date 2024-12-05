@@ -61,11 +61,11 @@ public class UnitaryTest {
 
         // Verificar que el contenido del archivo descomprimido sea igual al original
         try (FileInputStream inCopia = new FileInputStream(COPIA_FILENAME);
-             FileInputStream inDesc = new FileInputStream(ENTRADA_FILENAME)) {
+             FileInputStream inOrig = new FileInputStream(ENTRADA_FILENAME)) {
 
-            int datoOriginal=0;
-            int datoDescomprimido=0;
-            while ((datoOriginal = inCopia.read()) != -1 && (datoDescomprimido = inDesc.read()) != -1) {
+            int datoOriginal;
+            int datoDescomprimido;
+            while ( (datoDescomprimido = inOrig.read()) != -1 && (datoOriginal = inCopia.read()) != -1) {
                 assertEquals(datoOriginal, datoDescomprimido, "Los archivos no coinciden en el contenido.");
             }
             assertEquals(-1, datoDescomprimido, "El archivo descomprimido tiene más contenido que el original.");
